@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  namedzeus-relational-database:
+    build:
+      context: ./RelationalDatabase
+      dockerfile: Dockerfile
+    image: namedzeus-relational-database
+    container_name: namedzeus-relational-database
+    hostname: relational-database
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "netstat", "-a", "-p", "TCP", "-nl", "|", "grep", "0.0.0.0:5432"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  namedzeus-api:
+    build:
+      context: ./NamedZeusAPI
+      dockerfile: Dockerfile
+    image: namedzeus-api
+    container_name: namedzeus-api
+    hostname: api
+    restart: unless-stopped
+    ports:
+      - "4444:80"
+      - "4443:443"
+
+volumes: 
+  pgdata:

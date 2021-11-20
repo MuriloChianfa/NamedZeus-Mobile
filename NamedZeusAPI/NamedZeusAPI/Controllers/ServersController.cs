@@ -62,7 +62,7 @@ namespace NamedZeusAPI.Controllers
 
         // PUT: api/servers/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutServer(int id, [Bind("Name,IPAddress,NetflowPort,SNMPId,HealthCheck")] Server server)
+        public async Task<IActionResult> PutServer(int id, [Bind("Id,Name,IPAddress,NetflowPort,SNMPId,HealthCheck")] Server server)
         {
             if (id != server.Id)
             {
@@ -70,6 +70,24 @@ namespace NamedZeusAPI.Controllers
             }
 
             _context.Entry(server).State = EntityState.Modified;
+
+            int userId;
+
+            try
+            {
+                userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new
+                {
+                    error = "Not Authenticated"
+                });
+            }
+
+            User user = _context.User.Where(account => account.Id == userId).First();
+
+            server.UserId = user.Id;
 
             try
             {
@@ -87,7 +105,10 @@ namespace NamedZeusAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new
+            {
+                message = "Updated with success"
+            });
         }
 
         // POST: api/servers
@@ -132,7 +153,10 @@ namespace NamedZeusAPI.Controllers
             _context.Server.Remove(server);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new
+            {
+                message = "Deleted with success"
+            });
         }
 
         private bool ServerExists(int id)

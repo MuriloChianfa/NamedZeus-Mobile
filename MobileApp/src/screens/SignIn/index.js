@@ -50,6 +50,11 @@ export default () => {
     }
 
     const dispatchReceivedData = async json => {
+        if (json.error) {
+            alert(json.error);
+            return;
+        }
+
         if (json.message) {
             alert(json.message);
             return;

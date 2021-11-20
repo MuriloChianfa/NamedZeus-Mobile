@@ -32,7 +32,7 @@ export const MainArea = styled.View`
 `;
 
 export const MainTitle = styled.Text`
-    width: 143px;
+    width: 183px;
     font-size: 18px;
     font-weight: bold;
     color: #000;
@@ -70,6 +70,6 @@ export const LoadingIcon = styled.ActivityIndicator`
 `;
 
 export const ListArea = styled.View`
-    margin-top: 30px;
-    margin-bottom: 30px
+    margin-top: 10px;
+    margin-bottom: 10px;
 `;

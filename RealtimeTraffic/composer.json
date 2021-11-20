@@ -1,0 +1,21 @@
+{
+    "name": "murilochianfa/realtime-traffic",
+    "description": "A socketio implementation to get traffic from server",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Murilo Chianfa",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Source\\": "source"
+        },
+        "files": [
+            "source/Boot/Config.php",
+            "source/Boot/Helpers.php"
+        ]
+    },
+    "require": { }
+}

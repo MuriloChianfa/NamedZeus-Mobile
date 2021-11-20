@@ -14,7 +14,10 @@ import AddSNMP from '../screens/AddSNMP';
 const Tab = createBottomTabNavigator();
 
 export default () => (
-    <Tab.Navigator tabBar={props=><CustomTabBar {...props} />}>
+    <Tab.Navigator
+        tabBar={props=><CustomTabBar {...props}/>}
+        unmountInactiveRoutes={true}
+    >
         <Tab.Screen name="Home" component={Home} />
         <Tab.Screen name="Server" component={Server} />
         <Tab.Screen name="Dashboard" component={Dashboard} />

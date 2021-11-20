@@ -44,8 +44,6 @@ export default ({ state, navigation }) => {
     const goTo = (screenName) => {
         navigation.navigate(screenName);
     }
-
-    console.log(user);
     
     return (
         <TabArea>

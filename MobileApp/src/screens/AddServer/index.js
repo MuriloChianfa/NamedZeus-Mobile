@@ -23,7 +23,7 @@ import {
     CustomButtonText,
 } from './styles';
 
-export default () => {
+export default ({ route }) => {
     const [loading, setLoading] = useState(false);
     const [list, setList] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
@@ -33,18 +33,81 @@ export default () => {
     const [nameField, setNameField] = useState('');
     const [ipField, setIPField] = useState('');
     const [portField, setPortField] = useState('');
-    const [selected, setSelected] = useState({});
+    const [selected, setSelected] = useState(0);
+
+    const defineTitle = () => {
+        if (!route.params.id) {
+            return 'New';
+        }
+
+        return 'Edit';
+    }
+
+    const pageTitle = defineTitle();
+
+    const UpdateServer = async () => {
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.updateServer(token, route.params.id, nameField, ipField, portField, selected);
+        
+        if (data.errors) {
+            console.log(data);
+
+            if (data.errors.IPAddress) {
+                alert(data.errors.IPAddress);
+            }
+            else if (data.errors.NetflowPort) {
+                alert(data.errors.NetflowPort);
+            }
+            else {
+                alert("Ocorreu algum erro!");
+            }
+
+            setLoading(false);
+            return;
+        }
+        
+        alert("Server updated with success!");
+        
+        setLoading(false);
+
+        navigation.reset({
+            routes: [{name: 'Server'}]
+        });
+    }
 
     const handleSaveClick = async () => {
+        if (nameField == '' ||
+            ipField == '' ||
+            portField == '')
+        {
+            alert("Preencha todos os campos!");
+            return
+        }
+
         setLoading(true);
+
+        if (route.params.id) {
+            await UpdateServer();
+            return;
+        }
         
         let token = await AsyncStorage.getItem('token');
         let data = await Api.newServer(token, nameField, ipField, portField, selected);
         
-        console.log(data);
+        if (data.errors) {
+            console.log(data);
 
-        if (data.error == '') {
-            alert("erro!");
+            if (data.errors.IPAddress) {
+                alert(data.errors.IPAddress);
+            }
+            else if (data.errors.NetflowPort) {
+                alert(data.errors.NetflowPort);
+            }
+            else {
+                alert("Ocorreu algum erro!");
+            }
+
+            setLoading(false);
             return;
         }
         
@@ -58,6 +121,38 @@ export default () => {
     }
 
     const getSNMP = async () => {
+        if (!route.params.id) {
+            return;
+        }
+
+        // setLoading(true);
+
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.getServer(token, route.params.id);
+        
+        if (data.error == '') {
+            alert("erro!");
+            return;
+        }
+
+        setNameField(data.name);
+        setIPField(data.ipAddress);
+        setPortField(data.netflowPort.toString());
+
+        let snmps = await getSNMPsArray();
+
+        if (data.snmpId != 0) {
+            snmps.forEach(element => {
+                if (element.id == data.snmpId) {
+                    setSelected(element.id);
+                }
+            });
+        }
+
+        // setLoading(false);
+    }
+
+    const getSNMPs = async () => {
         let token = await AsyncStorage.getItem('token');
         let data = await Api.getSNMPs(token);
         
@@ -66,12 +161,24 @@ export default () => {
             return;
         }
 
-        setList(data);
+        await setList(data);
     }
 
-    const onRefresh = () => {
+    const getSNMPsArray = async () => {
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.getSNMPs(token);
+        
+        if (data.error == '') {
+            alert("erro!");
+            return;
+        }
+
+        return data;
+    }
+
+    const onRefresh = async () => {
         setRefreshing(false);
-        getSNMP();
+        await getSNMPs();
     }
 
     const styles = StyleSheet.create({
@@ -92,9 +199,10 @@ export default () => {
         return ( <Picker.Item key={index} label={key} value={item.id} /> )
     });
 
-    useEffect(() => {
-        getSNMP();
-    }, []);
+    useEffect(async () => {
+        await getSNMPs();
+        await getSNMP();
+    }, [route]);
 
     return (
         <Container>
@@ -106,7 +214,7 @@ export default () => {
                         navigation.goBack();
                     }}></BackIcon>
                     <HeaderTitle numberOfLines={2}>
-                        New Server
+                        {pageTitle} Server
                     </HeaderTitle>
                 </HeaderArea>
 
@@ -124,7 +232,7 @@ export default () => {
 
                     <GenericInput 
                         text="IP Address"
-                        placeholder="Empty email..."
+                        placeholder="Empty IP Address..."
                         value={ipField}
                         onChangeText={t=>setIPField(t)}
                     />
@@ -139,9 +247,9 @@ export default () => {
                     <Picker
                         style={styles.card}
                         selectedValue={selected}
-                        onValueChange={(i) => setSelected(i)}
+                        onValueChange={i => setSelected(i)}
                     >
-                        <Picker.Item key="0" label="Select one..." value={''} />
+                        <Picker.Item key="0" label="Select one..." value={0} />
                         {items}
                     </Picker>
 

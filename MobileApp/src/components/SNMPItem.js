@@ -2,10 +2,12 @@ import React from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 
-import Stars from '../components/Stars';
 import SNMPIcon from '../assets/snmp1.svg';
 
-const Area = styled.TouchableOpacity`
+import AsyncStorage from '@react-native-community/async-storage';
+import Api from '../Api';
+
+const Area = styled.View`
     background-color: #FFFFFF;
     margin-bottom: 20px;
     border-radius: 20px;
@@ -34,7 +36,7 @@ const SmallUserName = styled.Text`
     margin: 4px 0 4px 0;
 `;
 
-const SeeProfileButton = styled.View`
+const SeeProfileButton = styled.TouchableOpacity`
     width: 145px;
     height: 26px;
     border: 1px solid #F29999;
@@ -48,26 +50,64 @@ const SeeProfileButtonText = styled.Text`
     color: #BD4B4B;
 `;
 
+const DeleteSNMPButton = styled.TouchableOpacity`
+    width: 22px;
+    height: 22px;
+    border: 1px solid #F29999;
+    border-radius: 12px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+`;
+
 export default ({data}) => {
     const navigation = useNavigation();
 
+    const deleteItem = async id => {
+        console.log(`Deleting SNMP id ${id}`);
+
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.deleteSNMP(token, id);
+        
+        if (data.errors) {
+            console.log(data);
+
+            alert("Ocorreu algum erro!");
+            return;
+        }
+        
+        alert("SNMP deleted with success!");
+
+        navigation.reset({
+            routes: [{name: 'SNMP'}]
+        });
+    }
+
     return (
-        <Area onPress={() => {
-            navigation.navigate('AddSNMP', {
-                id: data.id
-            });
-        }}>
+        <Area>
             <SNMPIcon width="64" height="64" fill="#FFFFFF" />
             <InfoArea>
                 <UserName>Username: {data.user}</UserName>
                 <SmallUserName>Version: {data.version}</SmallUserName>
 
-                {/* <Stars stars={data.stars} showNumber={true} /> */}
-
-                <SeeProfileButton>
+                <SeeProfileButton onPress={() => {
+                    navigation.navigate('AddSNMP', {
+                        id: data.id
+                    });
+                }}>
                     <SeeProfileButtonText>Show!</SeeProfileButtonText>
                 </SeeProfileButton>
             </InfoArea>
+
+            <DeleteSNMPButton onPress={() => {
+                deleteItem(data.id);
+            }}>
+                <SeeProfileButtonText>
+                    X
+                </SeeProfileButtonText>
+            </DeleteSNMPButton>
         </Area>
     );
 }

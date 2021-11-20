@@ -48,10 +48,7 @@ export default () => {
             return;
         }
 
-        console.log(data);
-
         setList(data);
-
         setLoading(false);
     }
 
@@ -76,7 +73,7 @@ export default () => {
                 <HeaderArea>
                     <HeaderTitle numberOfLines={2}>
                         SNMP configurations
-                        <SearchButton onPress={()=>navigation.navigate('AddSNMP')}>
+                        <SearchButton onPress={()=>navigation.navigate('AddSNMP', { id: false })}>
                             <PlusIcon
                                 width="26"
                                 height="26"

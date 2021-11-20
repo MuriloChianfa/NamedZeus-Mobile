@@ -33,22 +33,18 @@ export default {
         })).json();
     },
     signUp: async (name, email, password) => {
-        const formData = new FormData();
-
-        formData.append("name", name);
-        formData.append("email", email);
-        formData.append("password", password);
-
-        const req = await fetch(`${BASE_API}/register`, {
+        return await (await fetch(`${BASE_API}/users`, {
             method: 'POST',
             headers: {
-                Accept: 'application/json',
-                'Content-Type': 'multipart/form-data'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: formData
-        });
-        const json = await req.json();
-        return json;
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                password: password
+            })
+        })).json();
     },
     refreshToken: async (token) => {
         return await (await fetch(`${BASE_API}/refresh`, {
@@ -91,8 +87,28 @@ export default {
             }
         })).json();
     },
+    getSNMP: async (token, id) => {
+        return await (await fetch(`${BASE_API}/snmps/${id}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })).json();
+    },
     getServers: async (token) => {
         return await (await fetch(`${BASE_API}/servers`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        })).json();
+    },
+    getServer: async (token, id) => {
+        return await (await fetch(`${BASE_API}/servers/${id}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -113,7 +129,37 @@ export default {
                 name: name,
                 ipAddress: ipAddress,
                 netflowPort: port,
-                snmpId: snmpId
+                snmpId: parseInt(snmpId)
+            })
+        })).json();
+    },
+    updateServer: async (token, id, name, ipAddress, port, snmpId) => {
+        return await (await fetch(`${BASE_API}/servers/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: parseInt(id),
+                name: name,
+                ipAddress: ipAddress,
+                netflowPort: port,
+                snmpId: parseInt(snmpId)
+            })
+        })).json();
+    },
+    deleteServer: async (token, id) => {
+        return await (await fetch(`${BASE_API}/servers/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: parseInt(id)
             })
         })).json();
     },
@@ -128,7 +174,36 @@ export default {
             body: JSON.stringify({
                 user: user,
                 password: password,
-                version: version
+                version: parseInt(version)
+            })
+        })).json();
+    },
+    updateSNMP: async (token, id, user, password, version) => {
+        return await (await fetch(`${BASE_API}/snmps/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: parseInt(id),
+                user: user,
+                password: password,
+                version: parseInt(version)
+            })
+        })).json();
+    },
+    deleteSNMP: async (token, id) => {
+        return await (await fetch(`${BASE_API}/snmps/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                id: parseInt(id)
             })
         })).json();
     },

@@ -14,9 +14,7 @@ export default () => {
     const navigation = useNavigation();
 
     useEffect(() => {
-        const dispatchReceivedData = async json => {
-            console.log(json);
-    
+        const dispatchReceivedData = async json => {    
             if (json.message) {
                 alert(json.message);
                 return;
@@ -44,7 +42,7 @@ export default () => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem('token');
 
-            console.log(token);
+            // console.log(token);
 
             if (!token) {
                 console.log("Token not found... returning to login.");
@@ -65,7 +63,13 @@ export default () => {
                 const json = await Promise
                     .race([timeout, request]);
                 
-                console.log(json);
+                if (json.error) {
+                    await AsyncStorage.removeItem('token');
+
+                    navigation.reset({
+                        routes: [{name: 'SignIn'}]
+                    });
+                }
 
                 dispatchReceivedData(json);
             }

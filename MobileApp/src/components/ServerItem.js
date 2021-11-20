@@ -4,7 +4,10 @@ import { useNavigation } from '@react-navigation/native';
 
 import SNMPIcon from '../assets/server1.svg';
 
-const Area = styled.TouchableOpacity`
+import AsyncStorage from '@react-native-community/async-storage';
+import Api from '../Api';
+
+const Area = styled.View`
     background-color: #FFFFFF;
     margin-bottom: 20px;
     border-radius: 20px;
@@ -42,7 +45,7 @@ const SmallUserNameDown = styled.Text`
     margin: 0 0 6px 0;
 `;
 
-const SeeProfileButton = styled.View`
+const SeeProfileButton = styled.TouchableOpacity`
     width: 145px;
     height: 26px;
     border: 1px solid #F29999;
@@ -56,27 +59,67 @@ const SeeProfileButtonText = styled.Text`
     color: #BD4B4B;
 `;
 
+const DeleteServerButton = styled.TouchableOpacity`
+    width: 22px;
+    height: 22px;
+    border: 1px solid #F29999;
+    border-radius: 12px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+`;
+
 export default ({data}) => {
     const navigation = useNavigation();
 
+    const deleteItem = async id => {
+        console.log(`Deleting server id ${id}`);
+
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.deleteServer(token, id);
+        
+        if (data.errors) {
+            console.log(data);
+
+            alert("Ocorreu algum erro!");
+            return;
+        }
+        
+        alert("Server deleted with success!");
+
+        navigation.reset({
+            routes: [{name: 'Server'}]
+        });
+    }
+
     return (
-        <Area onPress={() => {
-            navigation.navigate('AddServer', {
-                id: data.id
-            });
-        }}>
+        <Area>
             <SNMPIcon width="64" height="64" fill="#FFFFFF" />
             <InfoArea>
                 <UserName>Name: {data.name}</UserName>
                 <SmallUserNameUp>IPAddress: {data.ipAddress}</SmallUserNameUp>
                 <SmallUserNameDown>Netflow Port: {data.netflowPort}</SmallUserNameDown>
 
-                <SeeProfileButton>
+                <SeeProfileButton onPress={() => {
+                    navigation.navigate('AddServer', {
+                        id: data.id
+                    });
+                }}>
                     <SeeProfileButtonText>
                         Show!
                     </SeeProfileButtonText>
                 </SeeProfileButton>
             </InfoArea>
+
+            <DeleteServerButton onPress={() => {
+                deleteItem(data.id);
+            }}>
+                <SeeProfileButtonText>
+                    X
+                </SeeProfileButtonText>
+            </DeleteServerButton>
         </Area>
     );
 }

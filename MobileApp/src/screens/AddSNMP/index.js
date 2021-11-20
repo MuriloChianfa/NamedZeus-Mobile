@@ -22,7 +22,7 @@ import {
     CustomButtonText,
 } from './styles';
 
-export default () => {
+export default ({ route }) => {
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
 
@@ -30,18 +30,70 @@ export default () => {
 
     const [userField, setUserField] = useState('');
     const [passwordField, setPasswordField] = useState('');
-    const [selected, setSelected] = useState({});
+    const [selected, setSelected] = useState(2);
+
+    const UpdateSNMP = async () => {
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.updateSNMP(token, route.params.id, userField, passwordField, selected);
+        
+        if (data.errors) {
+            console.log(data);
+
+            if (data.errors.Password) {
+                alert(data.errors.Password);
+            }
+            else if (data.errors.User) {
+                alert(data.errors.User);
+            }
+            else {
+                alert("Ocorreu algum erro!");
+            }
+
+            setLoading(false);
+            return;
+        }
+        
+        alert("SNMP updated with success!");
+        
+        setLoading(false);
+
+        navigation.reset({
+            routes: [{name: 'SNMP'}]
+        });
+    }
 
     const handleSaveClick = async () => {
+        if (userField == '' ||
+            passwordField == '')
+        {
+            alert("Preencha todos os campos!");
+            return;
+        }
+
         setLoading(true);
+
+        if (route.params.id) {
+            await UpdateSNMP();
+            return;
+        }
         
         let token = await AsyncStorage.getItem('token');
         let data = await Api.newSNMP(token, userField, passwordField, selected);
         
-        console.log(data);
+        if (data.errors) {
+            console.log(data);
 
-        if (data.error == '') {
-            alert("erro!");
+            if (data.errors.Password) {
+                alert(data.errors.Password);
+            }
+            else if (data.errors.User) {
+                alert(data.errors.User);
+            }
+            else {
+                alert("Ocorreu algum erro!");
+            }
+
+            setLoading(false);
             return;
         }
         
@@ -54,17 +106,27 @@ export default () => {
         });
     }
 
-    // const getSNMP = async () => {
-    //     let token = await AsyncStorage.getItem('token');
-    //     let data = await Api.getSNMPs(token);
-        
-    //     if (data.error == '') {
-    //         alert("erro!");
-    //         return;
-    //     }
+    const getSNMP = async () => {
+        if (!route.params.id) {
+            return;
+        }
 
-    //     setList(data);
-    // }
+        // setLoading(true);
+
+        let token = await AsyncStorage.getItem('token');
+        let data = await Api.getSNMP(token, route.params.id);
+        
+        if (data.error == '') {
+            alert("erro!");
+            return;
+        }
+
+        setUserField(data.user);
+        setPasswordField(data.password);
+        setSelected(data.version);
+
+        // setLoading(false);
+    }
 
     const styles = StyleSheet.create({
         card: {
@@ -81,12 +143,12 @@ export default () => {
 
     const onRefresh = () => {
         setRefreshing(false);
-        // getSNMP();
+        getSNMP();
     }
 
-    // useEffect(() => {
-    //     getSNMP();
-    // }, []);
+    useEffect(() => {
+        getSNMP();
+    }, [route]);
 
     return (
         <Container>
@@ -110,10 +172,10 @@ export default () => {
                     <Picker
                         style={styles.card}
                         selectedValue={selected}
-                        onValueChange={(i) => setSelected(i)}
+                        onValueChange={i => setSelected(i)}
                     >
-                        <Picker.Item key="0" label="Version 2" value="2" />
-                        <Picker.Item key="1" label="Version 3" value="3" />
+                        <Picker.Item key="2" label="Version 2" value={2} />
+                        <Picker.Item key="3" label="Version 3" value={3} />
                     </Picker>
 
                     <GenericInput 

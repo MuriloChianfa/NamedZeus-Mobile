@@ -62,7 +62,7 @@ namespace NamedZeusAPI.Controllers
 
         // PUT: api/snmps/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSNMP(int id, [Bind("Version,User,Password")] SNMP snmp)
+        public async Task<IActionResult> PutSNMP(int id, [Bind("Id,Version,User,Password")] SNMP snmp)
         {
             if (id != snmp.Id)
             {
@@ -70,6 +70,24 @@ namespace NamedZeusAPI.Controllers
             }
 
             _context.Entry(snmp).State = EntityState.Modified;
+
+            int userId;
+
+            try
+            {
+                userId = int.Parse(User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier).Value);
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new
+                {
+                    error = "Not Authenticated"
+                });
+            }
+
+            User user = _context.User.Where(account => account.Id == userId).First();
+
+            snmp.UserId = user.Id;
 
             try
             {
@@ -87,7 +105,10 @@ namespace NamedZeusAPI.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new
+            {
+                message = "Updated with success"
+            });
         }
 
         // POST: api/snmps
@@ -133,7 +154,10 @@ namespace NamedZeusAPI.Controllers
             _context.Snmp.Remove(snmp);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new
+            {
+                message = "Deleted with success"
+            });
         }
 
         private bool SNMPExists(int id)

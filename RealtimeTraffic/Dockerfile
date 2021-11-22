@@ -1,12 +1,27 @@
 FROM php:7.4.2-cli
 
-RUN apt-get update && apt-get install vim -y && \
-    apt-get install openssl -y && \
-    apt-get install libssl-dev -y && \
-    apt-get install wget -y && \
-    apt-get install git -y && \
-    apt-get install procps -y && \
-    apt-get install htop -y
+# Setup sources list
+RUN echo "deb http://deb.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian/ buster-updates main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb http://security.debian.org/debian-security buster/updates main contrib non-free" >> /etc/apt/sources.list
+
+RUN apt-get update && \
+    apt-get -o Acquire::ForceIPv4=true -y \
+    --allow-unauthenticated install \
+    snmp-mibs-downloader \
+    tcptraceroute \
+    iputils-ping \
+    libsnmp-dev \
+    libssl-dev \
+    net-tools \
+    openssl \
+    tcpdump \
+    procps \
+    snmp \
+    wget \
+    git \
+    vim \
+    htop
 
 RUN cd /tmp && git clone https://github.com/swoole/swoole-src.git && \
     cd swoole-src && \
@@ -18,8 +33,15 @@ RUN cd /tmp && git clone https://github.com/swoole/swoole-src.git && \
 RUN touch /usr/local/etc/php/conf.d/swoole.ini && \
     echo 'extension=swoole.so' > /usr/local/etc/php/conf.d/swoole.ini
 
+# Install all needed extionsions in php
+RUN docker-php-ext-install \
+    snmp \
+    pcntl
+
 RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64
 RUN chmod +x /usr/local/bin/dumb-init
+
+RUN download-mibs
 
 RUN apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 

@@ -25,65 +25,31 @@ import {
     VerticalAxis
 } from 'react-native-responsive-linechart';
 
-import io from "socket.io-client";
+import data from '../../assets/data';
 
 export default ({ route }) => {
     const [loading, setLoading] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
     const [serverList, setServerList] = useState([]);
 
-    const [data1, setData1] = useState([
-        { x: 0, y: 12 },
-        { x: 1, y: 7 },
-        { x: 2, y: 6 },
-        { x: 3, y: 3 },
-        { x: 4, y: 5 },
-        { x: 5, y: 8 },
-        { x: 6, y: 12 },
-        { x: 7, y: 14 },
-        { x: 8, y: 12 },
-        { x: 9, y: 13.5 },
-        { x: 10, y: 18 },
-    ]);
-
-    const [data2, setData2] = useState([
-        { x: 0, y: 3 },
-        { x: 1, y: 2 },
-        { x: 2, y: 6 },
-        { x: 3, y: 6 },
-        { x: 4, y: 9 },
-        { x: 5, y: 12 },
-        { x: 6, y: 2 },
-        { x: 7, y: 3 },
-        { x: 8, y: 6 },
-        { x: 9, y: 8 },
-        { x: 10, y: 12 },
-    ]);
-
-    const socket = io("http://192.168.0.124:4444");
-
-    const setTraffic = async () => {
-        console.log('Setuping socket...');
-
-        socket.emit('configure', '192.168.0.168');
-
-        socket.on("set-traffic", msg => {
-            console.log('Received message: ');
-            console.log(msg);
-            setData1([...data1, msg]);
-        });
-    }
+    const [data1, setData1] = useState(data);
+    const [data2, setData2] = useState(data);
 
     const getTraffic = () => {
-        const loop = () => {
-            console.log('Emiting event...');
-            socket.emit('get-traffic', '');
+        // var ws = new WebSocket('ws://192.168.0.124:4444');
+        // ws.onmessage = data => {
+        //     console.log(data.data);
+        //     setData1(data1 => [...data1, parseInt(data.data.traffic)]);
+        // };
 
-            setTimeout(loop, 1000);
-        }
+        // const loop = () => {
+        //     console.log('Emiting event...');
+        //     ws.send(serverList[0]);
+        //     setTimeout(loop, 1000);
+        // }
     
-        // kickstart the loop
-        loop();
+        // // kickstart the loop
+        // loop();
     }
 
     const getServers = async () => {
@@ -110,7 +76,6 @@ export default ({ route }) => {
 
     useEffect(async () => {
         await getServers();
-        await setTraffic();
         getTraffic();
     }, [route]);
 
@@ -139,7 +104,7 @@ export default ({ route }) => {
                         <Chart
                             style={{ height: 200, width: '100%', marginTop: 0 }}
                             padding={{ left: 60, bottom: 20, right: 20, top: 20 }}
-                            xDomain={{ min: 0, max: 500 }}
+                            xDomain={{ min: 0, max: 173 }}
                             yDomain={{ min: 0, max: 20 }}
                         >
                             <VerticalAxis

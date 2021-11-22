@@ -37,36 +37,31 @@ export default () => {
     const [passwordField, setPassworField] = useState('');
 
     const handleSignClick = async () => {
-        if (emailField != '' && passwordField != '' && passwordField != '') {
-
-            let json = await Api.signUp(nameField, emailField, passwordField);
-            console.log(json);
-
-            if (json.token) {
-                await AsyncStorage.setItem('token', json.token);
-
-                userDispatch({
-                    type: 'setAvatar',
-                    payload: {
-                        avatar: 'www.google.com.br/imagemDoUsuario'
-                    }
-                });
-
-                navigation.reset({
-                    routes: [{name: 'MainTab'}]
-                });
-            }
-            else if (json.message) {
-                alert(json.message);
-            }
-            else {
-                alert('servidor offline');
-            }
-
-        }
-        else {
+        if (emailField == '' && passwordField == '' && passwordField == '') {
             alert("Preecha os campos");
+            return;
         }
+
+        let json = await Api.signUp(nameField, emailField, passwordField);
+        
+        console.log(json);
+
+        if (!json) {
+            alert('servidor offline');
+            return;
+        }
+
+        if (json.errors) {
+            console.log(json);
+            alert("Ocorreu algum erro!");
+            return;
+        }
+
+        navigation.reset({
+            routes: [{name: 'SignIn'}]
+        });
+
+        alert("Usuário criado com sucesso!");
     }
 
     const handleMessageButtonClick = () => {

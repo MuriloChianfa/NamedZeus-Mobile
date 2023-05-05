@@ -100,7 +100,7 @@ export default ({data}) => {
             <InfoArea>
                 <UserName>Name: {data.name}</UserName>
                 <SmallUserNameUp>IPAddress: {data.ipAddress}</SmallUserNameUp>
-                <SmallUserNameDown>Netflow Port: {data.netflowPort}</SmallUserNameDown>
+                <SmallUserNameDown>SNMP Port: {data.netflowPort}</SmallUserNameDown>
 
                 <SeeProfileButton onPress={() => {
                     navigation.navigate('AddServer', {

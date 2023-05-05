@@ -77,7 +77,7 @@ export default () => {
             <InputArea>
                 <MainArea>
                     <MainTitle>
-                        NamedZeus - Server traffic analyzer
+                        NamedZeus - Mobile
                     </MainTitle>
                 </MainArea>
 

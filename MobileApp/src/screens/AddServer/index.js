@@ -238,7 +238,7 @@ export default ({ route }) => {
                     />
 
                     <GenericInput 
-                        text="Netflow Port"
+                        text="SNMP Port"
                         placeholder="Empty port..."
                         value={portField}
                         onChangeText={t=>setPortField(t)}

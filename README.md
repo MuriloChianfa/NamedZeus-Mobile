@@ -1,9 +1,9 @@
 <h1 align="center"> NamedZeus Mobile </h1>
 
-> A simple server network monitoring app by SNMP mibs.
+> A simple server network monitoring mobile app by SNMP mibs.
 
 <p align="center">
-    <img src="MobileApp/src/assets/zeus.svg" style="width: 40%;" />
+    <img src="MobileApp/src/assets/zeus-white.png" style="width: 40%;" />
 </p>
 
 - Also, you can write by opening an Issue and also solve a current issue if possible.

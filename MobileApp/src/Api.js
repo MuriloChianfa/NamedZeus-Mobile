@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-community/async-storage';
 
-const BASE_API = 'http://192.168.0.124:49154/api';
+const BASE_API = 'http://192.168.0.179:4444/api';
 
 export default {
     checkToken: async (token) => {

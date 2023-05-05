@@ -7,7 +7,7 @@
         public const string SECRET = "fedaf7d8863b48e197b9287d492b708e";
         public const int TOKEN_VALID_TIME = 24;
 
-        public const string DB_HOST = "192.168.0.124";
+        public const string DB_HOST = "192.168.0.179";
         public const int DB_PORT = 5432;
         public const string DB_SCHEMA = "namedzeus";
         public const string DB_USER = "admin";
